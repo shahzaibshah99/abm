@@ -96,7 +96,7 @@ async function callModel(prompt: string, model: string, system: string = "You ar
 function researchPrompt(lead: any, rawData: any, context: string, productBlock: string) {
   const researchSlice = context.split("WRITING SLICE")[0];
   
-  return `You are a forensic consultant. Your only job is to find contradictions.
+  return `You are a forensic consultant. Your only job is to find the "Operational Gap."
   
 ${productBlock}
 
@@ -106,7 +106,7 @@ ${researchSlice}
 DATA: ${JSON.stringify(rawData)}
 
 TASK:
-Find the gap between what this company is showing the world and what is actually happening inside the operation.
+Find the gap between what this company is showing the world (public promises) and the likely internal friction or operational reality.
 Look for hiring patterns vs tech stack, public promises vs operational reality, growth milestones vs internal pressure.
 
 OUTPUT FORMAT (Plain Text Only):
@@ -116,19 +116,19 @@ Company: ...
 Tenure: ...
 Current Situation: [One sentence]
 
-CONTRADICTIONS:
-1. [Sharpest contradiction] - [Why it creates tension for this specific person]
-2. [Second contradiction] - [Why it creates tension for this specific person]
-3. [Third contradiction] - [Why it creates tension for this specific person]
+THE GAP:
+1. [Sharpest gap] - [Why it creates tension for this specific person]
+2. [Second gap] - [Why it creates tension for this specific person]
+3. [Third gap] - [Why it creates tension for this specific person]
 
 VERDICT:
-[The single sharpest contradiction most likely to create a genuine reaction in this specific person in this specific role right now]`;
+[The single sharpest gap that the product (AI Roadmap) can fill. Frame it as a tension they feel every day in their specific role.]`;
 }
 
 function copywriterPrompt(lead: any, brief: string, context: string, productBlock: string) {
   const writingSlice = context.split("WRITING SLICE")[1].split("CRITIC SLICE")[0];
   
-  return `You are the ABM Copywriter. Write a 3-email sequence using the Researcher's Brief.
+  return `You are the ABM Copywriter. Write a 3-email sequence to PITCH the product below.
   
 ${productBlock}
 
@@ -141,13 +141,14 @@ ${brief}
 PROSPECT: ${lead.n}, at ${lead.co}
 
 INSTRUCTIONS:
-1. Use the VERDICT from the brief as the entry point for the sequence.
-2. Email 1: Pattern Interrupt. Zero product mention. One sharp specific fact. No explanation.
-3. Email 2: Operational Mirror. Personal discomfort. Weave value prop naturally.
-4. Email 3: Opportunity Cost. Use their mission against the tension. Soft specific ask.
+1. DO NOT assume the prospect already uses the product. You are PITCHING it.
+2. Email 1: Pattern Interrupt. Zero product mention. One sharp specific observation about "THE GAP." No explanation.
+3. Email 2: Operational Mirror. Personal discomfort. Show them why their current ad-hoc approach to AI is risky. Weave the product (AI Roadmap) in as the professional fix.
+4. Email 3: Opportunity Cost. Use their mission against the tension. Soft specific ask for a 15-minute chat.
 5. Follow all formatting rules and banned words.
 6. CRITICAL: The reading level must be strictly 6th grade. Use simple words. No jargon.
 7. CRITICAL: The tone must be humanly. Sound like a peer, not a machine.
+8. NO SENTENCE LONGER THAN 15 WORDS.
 
 Return JSON: { "logicalAngle": "...", "emails": [{ "subject": "...", "body": "..." }] }`;
 }
