@@ -30,15 +30,21 @@ app.post("/api/gemini/generate", async (req, res) => {
     if (!apiKey) return res.status(401).json({ error: "GEMINI_API_KEY is missing" });
 
     const ai = new GoogleGenAI({ apiKey });
+    // Using gemini-2.5-flash as requested by the user
+    const modelName = model || "gemini-2.5-flash";
+    
     const response = await ai.models.generateContent({
-      model: model || "gemini-2.5-flash-latest",
-      contents: prompt,
-      config: { tools: useSearch ? [{ googleSearch: {} }] : undefined },
+      model: modelName,
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      config: { 
+        tools: useSearch ? [{ googleSearch: {} }] : undefined 
+      },
     });
+    
     res.json({ text: response.text || "" });
   } catch (error: any) {
     console.error("Gemini API Error:", error.message);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message || "Internal Server Error during Gemini generation" });
   }
 });
 

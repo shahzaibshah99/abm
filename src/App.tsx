@@ -84,7 +84,7 @@ async function callModel(prompt: string, model: string, system: string = "You ar
     const res = await fetch("/api/gemini/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt, model: "gemini-2.5-flash-latest", useSearch })
+      body: JSON.stringify({ prompt, model: "gemini-2.5-flash", useSearch })
     });
     const data = await res.json();
     if (data.error) throw new Error(data.error);
