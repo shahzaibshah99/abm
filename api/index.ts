@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import Anthropic from "@anthropic-ai/sdk";
 import nodemailer from "nodemailer";
+import { GoogleGenAI } from "@google/genai";
 
 dotenv.config();
 
@@ -20,6 +21,25 @@ app.use(express.json({ limit: '10mb' }));
 // API routes
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", message: "CORS is disabled" });
+});
+
+app.post("/api/gemini/generate", async (req, res) => {
+  try {
+    const { prompt, model, useSearch } = req.body;
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) return res.status(401).json({ error: "GEMINI_API_KEY is missing" });
+
+    const ai = new GoogleGenAI({ apiKey });
+    const response = await ai.models.generateContent({
+      model: model || "gemini-2.5-flash-latest",
+      contents: prompt,
+      config: { tools: useSearch ? [{ googleSearch: {} }] : undefined },
+    });
+    res.json({ text: response.text || "" });
+  } catch (error: any) {
+    console.error("Gemini API Error:", error.message);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 app.post("/api/claude/generate", async (req, res) => {

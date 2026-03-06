@@ -4,7 +4,6 @@
  */
 
 import React, { useState, useCallback, useRef, useEffect } from "react";
-import { GoogleGenAI } from "@google/genai";
 import Papa from "papaparse";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "./supabase";
@@ -82,16 +81,14 @@ async function callModel(prompt: string, model: string, system: string = "You ar
     if (data.error) throw new Error(data.error);
     return data.text;
   } else {
-    const apiKey = (typeof process !== 'undefined' && process.env.GEMINI_API_KEY) || (import.meta as any).env?.VITE_GEMINI_API_KEY;
-    if (!apiKey) throw new Error("GEMINI_API_KEY is missing.");
-    
-    const ai = new GoogleGenAI({ apiKey });
-    const response = await ai.models.generateContent({
-      model: "gemini-3.1-pro-preview",
-      contents: prompt,
-      config: { tools: useSearch ? [{ googleSearch: {} }] : undefined },
+    const res = await fetch("/api/gemini/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt, model: "gemini-2.5-flash-latest", useSearch })
     });
-    return response.text || "";
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    return data.text;
   }
 }
 
